@@ -7,7 +7,6 @@ gcloud beta functions deploy stop-idle-notebook \
 --trigger-http \
 --entry-point stop_notebook \
 --source . \
---allow-unauthenticated
 
 ```
 
