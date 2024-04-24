@@ -1,5 +1,263 @@
 {
   "components": {
+    "comp-condition-2": {
+      "dag": {
+        "tasks": {
+          "importer": {
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-importer"
+            },
+            "inputs": {
+              "parameters": {
+                "uri": {
+                  "componentInputParameter": "pipelinechannel--model_dir"
+                }
+              }
+            },
+            "taskInfo": {
+              "name": "importer"
+            }
+          },
+          "model-upload": {
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-model-upload"
+            },
+            "dependentTasks": [
+              "importer"
+            ],
+            "inputs": {
+              "artifacts": {
+                "unmanaged_container_model": {
+                  "taskOutputArtifact": {
+                    "outputArtifactKey": "artifact",
+                    "producerTask": "importer"
+                  }
+                }
+              },
+              "parameters": {
+                "display_name": {
+                  "componentInputParameter": "pipelinechannel--model_display_name"
+                },
+                "project": {
+                  "componentInputParameter": "pipelinechannel--project"
+                }
+              }
+            },
+            "taskInfo": {
+              "name": "model-upload"
+            }
+          }
+        }
+      },
+      "inputDefinitions": {
+        "parameters": {
+          "pipelinechannel--model_dir": {
+            "parameterType": "STRING"
+          },
+          "pipelinechannel--model_display_name": {
+            "parameterType": "STRING"
+          },
+          "pipelinechannel--project": {
+            "parameterType": "STRING"
+          },
+          "pipelinechannel--skip_training": {
+            "parameterType": "BOOLEAN"
+          }
+        }
+      }
+    },
+    "comp-condition-3": {
+      "dag": {
+        "tasks": {
+          "custom-training-job": {
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-custom-training-job"
+            },
+            "inputs": {
+              "parameters": {
+                "display_name": {
+                  "runtimeValue": {
+                    "constant": "train_yolov8_20240424_192213"
+                  }
+                },
+                "project": {
+                  "componentInputParameter": "pipelinechannel--project"
+                },
+                "worker_pool_specs": {
+                  "componentInputParameter": "pipelinechannel--worker_pool_specs"
+                }
+              }
+            },
+            "taskInfo": {
+              "name": "custom-training-job"
+            }
+          },
+          "importer-2": {
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-importer-2"
+            },
+            "dependentTasks": [
+              "custom-training-job"
+            ],
+            "inputs": {
+              "parameters": {
+                "uri": {
+                  "componentInputParameter": "pipelinechannel--model_dir"
+                }
+              }
+            },
+            "taskInfo": {
+              "name": "importer-2"
+            }
+          },
+          "model-upload-2": {
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-model-upload-2"
+            },
+            "dependentTasks": [
+              "importer-2"
+            ],
+            "inputs": {
+              "artifacts": {
+                "unmanaged_container_model": {
+                  "taskOutputArtifact": {
+                    "outputArtifactKey": "artifact",
+                    "producerTask": "importer-2"
+                  }
+                }
+              },
+              "parameters": {
+                "display_name": {
+                  "componentInputParameter": "pipelinechannel--model_display_name"
+                },
+                "project": {
+                  "componentInputParameter": "pipelinechannel--project"
+                }
+              }
+            },
+            "taskInfo": {
+              "name": "model-upload-2"
+            }
+          }
+        }
+      },
+      "inputDefinitions": {
+        "parameters": {
+          "pipelinechannel--model_dir": {
+            "parameterType": "STRING"
+          },
+          "pipelinechannel--model_display_name": {
+            "parameterType": "STRING"
+          },
+          "pipelinechannel--project": {
+            "parameterType": "STRING"
+          },
+          "pipelinechannel--skip_training": {
+            "parameterType": "BOOLEAN"
+          },
+          "pipelinechannel--worker_pool_specs": {
+            "parameterType": "LIST"
+          }
+        }
+      }
+    },
+    "comp-condition-branches-1": {
+      "dag": {
+        "tasks": {
+          "condition-2": {
+            "componentRef": {
+              "name": "comp-condition-2"
+            },
+            "inputs": {
+              "parameters": {
+                "pipelinechannel--model_dir": {
+                  "componentInputParameter": "pipelinechannel--model_dir"
+                },
+                "pipelinechannel--model_display_name": {
+                  "componentInputParameter": "pipelinechannel--model_display_name"
+                },
+                "pipelinechannel--project": {
+                  "componentInputParameter": "pipelinechannel--project"
+                },
+                "pipelinechannel--skip_training": {
+                  "componentInputParameter": "pipelinechannel--skip_training"
+                }
+              }
+            },
+            "taskInfo": {
+              "name": "condition-2"
+            },
+            "triggerPolicy": {
+              "condition": "inputs.parameter_values['pipelinechannel--skip_training'] == true"
+            }
+          },
+          "condition-3": {
+            "componentRef": {
+              "name": "comp-condition-3"
+            },
+            "inputs": {
+              "parameters": {
+                "pipelinechannel--model_dir": {
+                  "componentInputParameter": "pipelinechannel--model_dir"
+                },
+                "pipelinechannel--model_display_name": {
+                  "componentInputParameter": "pipelinechannel--model_display_name"
+                },
+                "pipelinechannel--project": {
+                  "componentInputParameter": "pipelinechannel--project"
+                },
+                "pipelinechannel--skip_training": {
+                  "componentInputParameter": "pipelinechannel--skip_training"
+                },
+                "pipelinechannel--worker_pool_specs": {
+                  "componentInputParameter": "pipelinechannel--worker_pool_specs"
+                }
+              }
+            },
+            "taskInfo": {
+              "name": "condition-3"
+            },
+            "triggerPolicy": {
+              "condition": "!(inputs.parameter_values['pipelinechannel--skip_training'] == true)"
+            }
+          }
+        }
+      },
+      "inputDefinitions": {
+        "parameters": {
+          "pipelinechannel--model_dir": {
+            "parameterType": "STRING"
+          },
+          "pipelinechannel--model_display_name": {
+            "parameterType": "STRING"
+          },
+          "pipelinechannel--project": {
+            "parameterType": "STRING"
+          },
+          "pipelinechannel--skip_training": {
+            "parameterType": "BOOLEAN"
+          },
+          "pipelinechannel--worker_pool_specs": {
+            "parameterType": "LIST"
+          }
+        }
+      }
+    },
     "comp-custom-training-job": {
       "executorLabel": "exec-custom-training-job",
       "inputDefinitions": {
@@ -117,8 +375,122 @@
         }
       }
     },
+    "comp-importer-2": {
+      "executorLabel": "exec-importer-2",
+      "inputDefinitions": {
+        "parameters": {
+          "uri": {
+            "parameterType": "STRING"
+          }
+        }
+      },
+      "outputDefinitions": {
+        "artifacts": {
+          "artifact": {
+            "artifactType": {
+              "schemaTitle": "google.UnmanagedContainerModel",
+              "schemaVersion": "0.0.1"
+            }
+          }
+        }
+      }
+    },
     "comp-model-upload": {
       "executorLabel": "exec-model-upload",
+      "inputDefinitions": {
+        "artifacts": {
+          "parent_model": {
+            "artifactType": {
+              "schemaTitle": "google.VertexModel",
+              "schemaVersion": "0.0.1"
+            },
+            "description": "An artifact of a model which to upload a new version to. Only specify this field when uploading a new version. [More information.](https://cloud.google.com/vertex-ai/docs/reference/rest/v1/projects.locations.models/upload#request-body)",
+            "isOptional": true
+          },
+          "unmanaged_container_model": {
+            "artifactType": {
+              "schemaTitle": "google.UnmanagedContainerModel",
+              "schemaVersion": "0.0.1"
+            },
+            "description": "The unmanaged container model to be uploaded.  The Model can be passed from an upstream step or imported via a KFP `dsl.importer`. Example:\nfrom kfp import dsl\nfrom google_cloud_pipeline_components.types import artifact_types\n\nimporter_spec = dsl.importer( artifact_uri='gs://managed-pipeline-gcpc-e2e-test/automl-tabular/model', artifact_class=artifact_types.UnmanagedContainerModel, metadata={ 'containerSpec': { 'imageUri': 'us-docker.pkg.dev/vertex-ai/automl-tabular/prediction-server:prod' } })",
+            "isOptional": true
+          }
+        },
+        "parameters": {
+          "description": {
+            "defaultValue": "",
+            "description": "The description of the Model. [More information.](https://cloud.google.com/vertex-ai/docs/reference/rest/v1/projects.locations.models#Model)",
+            "isOptional": true,
+            "parameterType": "STRING"
+          },
+          "display_name": {
+            "description": "The display name of the Model. The name can be up to 128 characters long and can be consist of any UTF-8 characters. [More information.](https://cloud.google.com/vertex-ai/docs/reference/rest/v1/projects.locations.models#Model)",
+            "parameterType": "STRING"
+          },
+          "encryption_spec_key_name": {
+            "defaultValue": "",
+            "description": "Customer-managed encryption key spec for a Model. If set, this Model and all sub-resources of this Model will be secured by this key.  Has the form: `projects/my-project/locations/my-location/keyRings/my-kr/cryptoKeys/my-key`. The key needs to be in the same region as where the compute resource is created.",
+            "isOptional": true,
+            "parameterType": "STRING"
+          },
+          "explanation_metadata": {
+            "defaultValue": {},
+            "description": "Metadata describing the Model's input and output for explanation. Both `explanation_metadata` and `explanation_parameters` must be passed together when used. [More information.](https://cloud.google.com/vertex-ai/docs/reference/rest/v1/ExplanationSpec#explanationmetadata)",
+            "isOptional": true,
+            "parameterType": "STRUCT"
+          },
+          "explanation_parameters": {
+            "defaultValue": {},
+            "description": "Parameters to configure explaining for Model's predictions.  [More information.](https://cloud.google.com/vertex-ai/docs/reference/rest/v1/ExplanationSpec#ExplanationParameters)",
+            "isOptional": true,
+            "parameterType": "STRUCT"
+          },
+          "labels": {
+            "defaultValue": {},
+            "description": "The labels with user-defined metadata to organize your model.  Label keys and values can be no longer than 64 characters (Unicode codepoints), can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed.  See https://goo.gl/xmQnxf for more information and examples of labels.",
+            "isOptional": true,
+            "parameterType": "STRUCT"
+          },
+          "location": {
+            "defaultValue": "us-central1",
+            "description": "Optional location to upload this Model to. If not set, defaults to `us-central1`.",
+            "isOptional": true,
+            "parameterType": "STRING"
+          },
+          "project": {
+            "defaultValue": "{{$.pipeline_google_cloud_project_id}}",
+            "description": "Project to upload this Model to. Defaults to the project in which the PipelineJob is run.",
+            "isOptional": true,
+            "parameterType": "STRING"
+          },
+          "version_aliases": {
+            "defaultValue": [],
+            "description": "User provided version aliases so that a model version can be referenced via alias (i.e. `projects/{project}/locations/{location}/models/{modelId}@{version_alias}` instead of auto-generated version id (i.e. `projects/{project}/locations/{location}/models/{modelId}@{versionId}`). The format is [a-z][a-zA-Z0-9-]{0,126}[a-z0-9] to distinguish from versionId. A default version alias will be created for the first version of the model, and there must be exactly one default version alias for a model.",
+            "isOptional": true,
+            "parameterType": "LIST"
+          }
+        }
+      },
+      "outputDefinitions": {
+        "artifacts": {
+          "model": {
+            "artifactType": {
+              "schemaTitle": "google.VertexModel",
+              "schemaVersion": "0.0.1"
+            },
+            "description": "Artifact tracking the created Model version."
+          }
+        },
+        "parameters": {
+          "gcp_resources": {
+            "description": "Serialized JSON of `gcp_resources` [proto](https://github.com/kubeflow/pipelines/tree/master/components/google-cloud/google_cloud_pipeline_components/proto) which tracks the upload Model's long-running operation.",
+            "parameterType": "STRING"
+          }
+        }
+      }
+    },
+    "comp-model-upload-2": {
+      "executorLabel": "exec-model-upload-2",
       "inputDefinitions": {
         "artifacts": {
           "parent_model": {
@@ -240,7 +612,23 @@
       "exec-importer": {
         "importer": {
           "artifactUri": {
-            "constant": "gs://donuts-dev-usc1/temporal/keras_yolov8/train_yolov8_20240424_104154"
+            "runtimeParameter": "uri"
+          },
+          "metadata": {
+            "containerSpec": {
+              "imageUri": "us-docker.pkg.dev/vertex-ai-restricted/prediction/tf_opt-gpu.2-12:latest"
+            }
+          },
+          "typeSchema": {
+            "schemaTitle": "google.UnmanagedContainerModel",
+            "schemaVersion": "0.0.1"
+          }
+        }
+      },
+      "exec-importer-2": {
+        "importer": {
+          "artifactUri": {
+            "runtimeParameter": "uri"
           },
           "metadata": {
             "containerSpec": {
@@ -278,6 +666,32 @@
           ],
           "image": "gcr.io/ml-pipeline/google-cloud-pipeline-components:2.13.1"
         }
+      },
+      "exec-model-upload-2": {
+        "container": {
+          "args": [
+            "--type",
+            "UploadModel",
+            "--payload",
+            "{\"Concat\": [\"{\", \"\\\"display_name\\\": \\\"\", \"{{$.inputs.parameters['display_name']}}\", \"\\\"\", \", \\\"description\\\": \\\"\", \"{{$.inputs.parameters['description']}}\", \"\\\"\", \", \\\"explanation_spec\\\": {\", \"\\\"parameters\\\": \", \"{{$.inputs.parameters['explanation_parameters']}}\", \", \\\"metadata\\\": \", \"{{$.inputs.parameters['explanation_metadata']}}\", \"}\", \", \\\"encryption_spec\\\": {\\\"kms_key_name\\\":\\\"\", \"{{$.inputs.parameters['encryption_spec_key_name']}}\", \"\\\"}\", \", \\\"version_aliases\\\": \", \"{{$.inputs.parameters['version_aliases']}}\", \", \\\"labels\\\": \", \"{{$.inputs.parameters['labels']}}\", \", \\\"pipeline_job\\\": \\\"\", \"projects/{{$.inputs.parameters['project']}}/locations/{{$.inputs.parameters['location']}}/pipelineJobs/{{$.pipeline_job_uuid}}\", \"\\\"\", \"}\"]}",
+            "--project",
+            "{{$.inputs.parameters['project']}}",
+            "--location",
+            "{{$.inputs.parameters['location']}}",
+            "--gcp_resources",
+            "{{$.outputs.parameters['gcp_resources'].output_file}}",
+            "--executor_input",
+            "{{$}}",
+            "{\"IfPresent\": {\"InputName\": \"parent_model\", \"Then\": [\"--parent_model_name\", \"{{$.inputs.artifacts['parent_model'].metadata['resourceName']}}\"]}}"
+          ],
+          "command": [
+            "python3",
+            "-u",
+            "-m",
+            "google_cloud_pipeline_components.container.v1.model.upload_model.launcher"
+          ],
+          "image": "gcr.io/ml-pipeline/google-cloud-pipeline-components:2.13.1"
+        }
       }
     }
   },
@@ -287,165 +701,46 @@
   "root": {
     "dag": {
       "tasks": {
-        "custom-training-job": {
-          "cachingOptions": {
-            "enableCache": true
-          },
+        "condition-branches-1": {
           "componentRef": {
-            "name": "comp-custom-training-job"
+            "name": "comp-condition-branches-1"
           },
           "inputs": {
             "parameters": {
-              "display_name": {
-                "runtimeValue": {
-                  "constant": "train_yolov8_20240424_104154"
-                }
+              "pipelinechannel--model_dir": {
+                "componentInputParameter": "model_dir"
               },
-              "project": {
-                "componentInputParameter": "project"
-              },
-              "worker_pool_specs": {
-                "runtimeValue": {
-                  "constant": [
-                    {
-                      "container_spec": {
-                        "args": [
-                          "--input_csv_path={{channel:task=;name=input_csv_path;type=String;}}",
-                          "--output_model_dir=gs://donuts-dev-usc1/temporal/keras_yolov8/train_yolov8_20240424_104154",
-                          "--epochs={{channel:task=;name=epochs;type=Integer;}}",
-                          "--pretrained_backbone={{channel:task=;name=backbone;type=String;}}",
-                          "--fpn_depth={{channel:task=;name=fpn_depth;type=Integer;}}",
-                          "--learning_rate={{channel:task=;name=learning_rate;type=Float;}}",
-                          "--confidence_threshold={{channel:task=;name=confidence_threshold;type=Float;}}",
-                          "--iou_threshold={{channel:task=;name=iou_threshold;type=Float;}}"
-                        ],
-                        "command": [],
-                        "env": [
-                          {
-                            "name": "RESOLUTION",
-                            "value": "512"
-                          }
-                        ],
-                        "image_uri": "us-docker.pkg.dev/vertex-ai/vertex-vision-model-garden-dockers/keras-yolov8-train"
-                      },
-                      "disk_spec": {
-                        "boot_disk_size_gb": 500.0,
-                        "boot_disk_type": "pd-ssd"
-                      },
-                      "machine_spec": {
-                        "accelerator_count": 2.0,
-                        "accelerator_type": "NVIDIA_TESLA_V100",
-                        "machine_type": "n1-highmem-16"
-                      },
-                      "replica_count": 1.0
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "taskInfo": {
-            "name": "custom-training-job"
-          }
-        },
-        "importer": {
-          "cachingOptions": {
-            "enableCache": true
-          },
-          "componentRef": {
-            "name": "comp-importer"
-          },
-          "dependentTasks": [
-            "custom-training-job"
-          ],
-          "inputs": {
-            "parameters": {
-              "uri": {
-                "runtimeValue": {
-                  "constant": "gs://donuts-dev-usc1/temporal/keras_yolov8/train_yolov8_20240424_104154"
-                }
-              }
-            }
-          },
-          "taskInfo": {
-            "name": "importer"
-          }
-        },
-        "model-upload": {
-          "cachingOptions": {
-            "enableCache": true
-          },
-          "componentRef": {
-            "name": "comp-model-upload"
-          },
-          "dependentTasks": [
-            "importer"
-          ],
-          "inputs": {
-            "artifacts": {
-              "unmanaged_container_model": {
-                "taskOutputArtifact": {
-                  "outputArtifactKey": "artifact",
-                  "producerTask": "importer"
-                }
-              }
-            },
-            "parameters": {
-              "display_name": {
+              "pipelinechannel--model_display_name": {
                 "componentInputParameter": "model_display_name"
               },
-              "project": {
+              "pipelinechannel--project": {
                 "componentInputParameter": "project"
+              },
+              "pipelinechannel--skip_training": {
+                "componentInputParameter": "skip_training"
+              },
+              "pipelinechannel--worker_pool_specs": {
+                "componentInputParameter": "worker_pool_specs"
               }
             }
           },
           "taskInfo": {
-            "name": "model-upload"
+            "name": "condition-branches-1"
           }
         }
       }
     },
     "inputDefinitions": {
       "parameters": {
-        "backbone": {
-          "defaultValue": "yolo_v8_xl_backbone_coco",
-          "isOptional": true,
-          "parameterType": "STRING"
-        },
-        "confidence_threshold": {
-          "defaultValue": 0.02,
-          "isOptional": true,
-          "parameterType": "NUMBER_DOUBLE"
-        },
-        "epochs": {
-          "defaultValue": 10.0,
-          "isOptional": true,
-          "parameterType": "NUMBER_INTEGER"
-        },
-        "fpn_depth": {
-          "defaultValue": 3.0,
-          "isOptional": true,
-          "parameterType": "NUMBER_INTEGER"
-        },
         "gpu_count": {
           "defaultValue": 2.0,
           "isOptional": true,
           "parameterType": "NUMBER_INTEGER"
         },
-        "input_csv_path": {
-          "defaultValue": "gs://cloud-samples-data/vision/salads.csv",
+        "model_dir": {
+          "defaultValue": "gs://donuts-dev-usc1/temporal/keras_yolov8/train_yolov8_20240424_185924",
           "isOptional": true,
           "parameterType": "STRING"
-        },
-        "iou_threshold": {
-          "defaultValue": 0.3,
-          "isOptional": true,
-          "parameterType": "NUMBER_DOUBLE"
-        },
-        "learning_rate": {
-          "defaultValue": 0.0005,
-          "isOptional": true,
-          "parameterType": "NUMBER_DOUBLE"
         },
         "model_display_name": {
           "defaultValue": "yolov8_fine_tuned",
@@ -456,6 +751,49 @@
           "defaultValue": "donuts-dev",
           "isOptional": true,
           "parameterType": "STRING"
+        },
+        "skip_training": {
+          "defaultValue": false,
+          "isOptional": true,
+          "parameterType": "BOOLEAN"
+        },
+        "worker_pool_specs": {
+          "defaultValue": [
+            {
+              "container_spec": {
+                "args": [
+                  "--input_csv_path=gs://cloud-samples-data/vision/salads.csv",
+                  "--output_model_dir=gs://donuts-dev-usc1/temporal/keras_yolov8/train_yolov8_20240424_185924",
+                  "--epochs=10",
+                  "--pretrained_backbone=yolo_v8_xl_backbone_coco",
+                  "--fpn_depth=3",
+                  "--learning_rate=0.0005",
+                  "--confidence_threshold=0.02",
+                  "--iou_threshold=0.3"
+                ],
+                "command": [],
+                "env": [
+                  {
+                    "name": "RESOLUTION",
+                    "value": "512"
+                  }
+                ],
+                "image_uri": "us-docker.pkg.dev/vertex-ai/vertex-vision-model-garden-dockers/keras-yolov8-train"
+              },
+              "disk_spec": {
+                "boot_disk_size_gb": 500.0,
+                "boot_disk_type": "pd-ssd"
+              },
+              "machine_spec": {
+                "accelerator_count": 2.0,
+                "accelerator_type": "NVIDIA_TESLA_V100",
+                "machine_type": "n1-highmem-16"
+              },
+              "replica_count": 1.0
+            }
+          ],
+          "isOptional": true,
+          "parameterType": "LIST"
         }
       }
     }
